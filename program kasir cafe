@@ -1,0 +1,115 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+string menu[9] = {"Espresso", "Americano", "Cafe Latte", "Capucinno", "Mochacino", "Matcha", "Butterscoth", "Machiato", "Affogatto"};
+int harga[9] = {15000, 20000, 25000, 22000, 25000, 21000, 27000, 30000, 33000};
+
+int keranjang_id[100];
+int keranjang_jumlah[100];
+int jumlah_pesanan = 0; 
+
+void tampilkanMenu() {
+    cout << "=== KEDAI KOPI ===";
+    for (int i = 0; i < 9; i++) {
+        cout << i + 1 << ". " << menu[i] << " - Rp" << harga[i] << "\n";
+    }
+}
+
+int hitungTotal() {
+    int total = 0;
+    for (int i = 0; i < jumlah_pesanan; i++) {
+        int id_menu = keranjang_id[i];
+        total += harga[id_menu] * keranjang_jumlah[i];
+    }
+    return total;
+}
+
+void cetakStruk(int total, int bayar, int diskon) {
+    cout << "====================================";
+    cout << "            STRUK PEMBELIAN         ";
+    cout << "====================================";
+    for (int i = 0; i < jumlah_pesanan; i++) {
+        int id = keranjang_id[i];
+        int qty = keranjang_jumlah[i];
+        int subtotal = harga[id] * qty;
+        cout << menu[id] << " x" << qty << " : Rp" << subtotal << "\n";
+    }
+    cout << "------------------------------------";
+    
+    cout << "Subtotal    : Rp" << total + diskon << "\n";
+    
+    if (diskon > 0) {
+        cout << "Diskon (Kelipatan) : -Rp" << diskon << "\n";
+    }
+    
+    cout << "Total Akhir : Rp" << total << "\n";
+    cout << "Tunai       : Rp" << bayar << "\n";
+    cout << "Kembalian   : Rp" << bayar - total << "\n";
+    cout << "====================================\n";
+    cout << "            Terima Kasih!           \n";
+}
+
+int main() {
+    char tambahLagi;
+    
+    do {
+        tampilkanMenu();
+        
+        int pilihan, jumlah;
+        
+        cout << "Masukkan nomor pesanan (1-9): ";
+        cin >> pilihan;
+        
+        if (pilihan < 1 || pilihan > 9) {
+            cout << "Error: Menu tidak tersedia. Silakan coba lagi.";
+            continue; 
+        }
+        
+        cout << "Masukkan jumlah pesanan: ";
+        cin >> jumlah;
+        
+        if (jumlah <= 0) {
+            cout << "Error: Jumlah pesanan tidak valid.";
+            continue;
+        }
+        
+        keranjang_id[jumlah_pesanan] = pilihan - 1;
+        keranjang_jumlah[jumlah_pesanan] = jumlah;
+        jumlah_pesanan++;
+        
+        cout << "Tambah pesanan? (Y/T): ";
+        cin >> tambahLagi;
+    } while (tambahLagi == 'Y' || tambahLagi == 'y');
+    
+    int totalBelanja = hitungTotal();
+    int diskon = 0;
+    
+    int kelipatan = totalBelanja / 100000;
+    
+    if (kelipatan > 0) {
+        diskon = kelipatan * 15000; 
+        totalBelanja -= diskon;
+        
+        cout << "Selamat! Anda mendapatkan promo potongan kelipatan sebanyak " << kelipatan << "x.\n";
+        cout << "Total diskon Anda: Rp" << diskon << "\n";
+    }
+    
+    cout << "\nTotal yang harus dibayar: Rp" << totalBelanja << "\n";
+    
+    int bayar;
+    while (true) {
+        cout << "Masukkan jumlah uang tunai: Rp";
+        cin >> bayar;
+        
+        if (bayar < totalBelanja) {
+            cout << "Maaf, uang Anda kurang Rp" << totalBelanja - bayar << ". Silakan input ulang.\n";
+        } else {
+            break; 
+        }
+    }
+    
+    cetakStruk(totalBelanja, bayar, diskon);
+    
+    return 0;
+}
